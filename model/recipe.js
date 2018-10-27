@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
 const TimeSchema = new mongoose.Schema(
   {
@@ -9,8 +9,8 @@ const TimeSchema = new mongoose.Schema(
     unit: {
       required: true,
       type: String,
-      enum: ["min"],
-      default: "min"
+      enum: ['min'],
+      default: 'min'
     }
   },
   { _id: false }
@@ -62,7 +62,7 @@ const Recipe = {
 
 const RecipeSchema = new mongoose.Schema(Recipe, { timestamps: true });
 
-const RecipeModel = mongoose.model("Recipes", RecipeSchema);
+const RecipeModel = mongoose.model('Recipes', RecipeSchema);
 
 module.exports = {
   RecipeModel
