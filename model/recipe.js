@@ -35,7 +35,7 @@ const Recipe = {
   description: String,
   person: Number,
   time: TimeSchema,
-  tag: [String],
+  tags: [String],
   type: String,
   image: String,
   tools: [{ _id: false, name: String, quantity: String }],
