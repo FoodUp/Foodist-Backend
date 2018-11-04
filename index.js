@@ -10,7 +10,10 @@ const Port = 3001;
 const Host = 'localhost';
 const server = Hapi.server({
   port: Port,
-  host: Host
+  host: Host,
+  routes: {
+    cors: true
+  }
 });
 
 server.route({
@@ -48,18 +51,25 @@ server.route({
 server.route({
   method: 'Post',
   path: '/recipes',
-  config: {
-    cors: {
-      origin: ['*']
+  handler: async (request, h) => {
+    console.log(typeof request.payload);
+    try {
+      const recipe = await RecipeModel.create(request.payload);
+      return recipe;
+    } catch (err) {
+      console.log(err.message);
+      return h.response(err.message).code(400);
     }
-  },
-  handler: (request, h) => {
-    console.log(JSON.stringify(request.payload));
-    //TODO: create Repipe from payload, and save to db
+  }
+});
+
+server.route({
+  method: 'Post',
+  path: '/recipes/{id}/image',
+  handler: async (request, h) => {
     // TODO: save image to disk
-    // TODO: return
-    return { a: 'value' };
-    // return RecipeModel.create(request.payload);
+    console.log(request.params.id);
+    return 'nice id';
   }
 });
 

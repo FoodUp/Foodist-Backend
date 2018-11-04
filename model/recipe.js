@@ -19,7 +19,7 @@ const TimeSchema = new mongoose.Schema(
 const RecipeStepSchema = new mongoose.Schema(
   {
     image: String,
-    description: {
+    text: {
       type: String,
       required: true
     }
@@ -38,7 +38,7 @@ const Recipe = {
   tag: [String],
   type: String,
   image: String,
-  tool: [{ _id: false, name: String, quantity: String }],
+  tools: [{ _id: false, name: String, quantity: String }],
   ingredients: {
     type: [
       {
