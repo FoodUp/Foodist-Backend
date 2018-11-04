@@ -2,9 +2,37 @@ const fs = require('fs');
 const Hapi = require('hapi');
 const fp = require('lodash/fp');
 const { Types } = require('mongoose');
+const { ObjectId } = require('mongodb');
 
 require('./db');
 const { RecipeModel } = require('./model/recipe');
+function savePublicImageFromBuffer(imageName, file) {
+  console.log(file.hapi);
+  console.log('check instance:', file instanceof fs.ReadStream);
+  const imgPath = './image/recipes/' + imageName;
+  const fileStream = fs.createWriteStream(imgPath);
+  return new Promise((resolve, reject) => {
+    file.on('error', function(err) {
+      reject(err);
+    });
+
+    file.pipe(fileStream);
+
+    file.on('end', function(err) {
+      const fileDetails = {
+        fieldname: file.hapi.headers.name,
+        originalname: file.hapi.filename,
+        filename: imageName,
+        mimetype: file.hapi.headers['content-type'],
+        destination: 'image/recipes',
+        size: fs.statSync(imgPath).size
+      };
+
+      resolve(fileDetails);
+    });
+  });
+  return;
+}
 
 const Port = 3001;
 const Host = 'localhost';
@@ -52,7 +80,7 @@ server.route({
   method: 'Post',
   path: '/recipes',
   handler: async (request, h) => {
-    console.log(typeof request.payload);
+    console.log(request.payload);
     try {
       const recipe = await RecipeModel.create(request.payload);
       return recipe;
@@ -66,10 +94,34 @@ server.route({
 server.route({
   method: 'Post',
   path: '/recipes/{id}/image',
+  config: {
+    payload: {
+      output: 'stream'
+    }
+  },
   handler: async (request, h) => {
-    // TODO: save image to disk
-    console.log(request.params.id);
-    return 'nice id';
+    // check if id exists in db
+    console.log('request recipe id: ', request.params.id);
+    const recipeId = request.params.id;
+    const recipe = await RecipeModel.findOne({ _id: recipeId });
+    if (!recipe) {
+      return h.response('recipe not found').code(404);
+    }
+
+    // save image to disk
+    const imageName = new ObjectId();
+    const fileDetails = await savePublicImageFromBuffer(
+      imageName,
+      request.payload.image
+    );
+    console.log('saved file:', fileDetails);
+    // update recipe with image path
+    recipe.image = imageName;
+    await recipe.save();
+    return {
+      status: 'success',
+      content: recipe.image
+    };
   }
 });
 
