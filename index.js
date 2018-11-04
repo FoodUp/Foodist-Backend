@@ -1,3 +1,4 @@
+const fs = require('fs');
 const Hapi = require('hapi');
 const fp = require('lodash/fp');
 const { Types } = require('mongoose');
@@ -47,8 +48,18 @@ server.route({
 server.route({
   method: 'Post',
   path: '/recipes',
+  config: {
+    cors: {
+      origin: ['*']
+    }
+  },
   handler: (request, h) => {
-    return RecipeModel.create(request.payload);
+    console.log(JSON.stringify(request.payload));
+    //TODO: create Repipe from payload, and save to db
+    // TODO: save image to disk
+    // TODO: return
+    return { a: 'value' };
+    // return RecipeModel.create(request.payload);
   }
 });
 

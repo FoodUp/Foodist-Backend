@@ -2,7 +2,7 @@ var mongoose = require('mongoose');
 
 mongoose.connect(
   'mongodb://localhost:27017/foodist',
-  { strict: true },
+  { useNewUrlParser: true },
   err => {
     if (err) {
       return console.log(err);
