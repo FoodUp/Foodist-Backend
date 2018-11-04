@@ -77,6 +77,14 @@ server.route({
 });
 
 server.route({
+  method: 'Get',
+  path: '/recipe/image/{imageName}',
+  handler: (request, h) => {
+    return h.file('./image/recipes/' + request.params.imageName);
+  }
+});
+
+server.route({
   method: 'Post',
   path: '/recipes',
   handler: async (request, h) => {
@@ -133,6 +141,7 @@ async function init() {
       logEvents: ['response']
     }
   });
+  await server.register(require('inert'));
   await server.start();
   console.log(`server has started at: ${Host}:${Port}`);
 }
