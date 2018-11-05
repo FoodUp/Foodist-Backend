@@ -57,6 +57,10 @@ const Recipe = {
   color: {
     type: String,
     required: true
+  },
+  online: {
+    type: Boolean,
+    default: false
   }
 };
 

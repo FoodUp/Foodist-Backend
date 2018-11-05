@@ -54,7 +54,7 @@ server.route({
     return 'hello hello';
   }
 });
-
+//get all reipes
 server.route({
   method: 'Get',
   path: '/recipes',
@@ -62,7 +62,7 @@ server.route({
     return RecipeModel.find();
   }
 });
-
+// get recipe by id
 server.route({
   method: 'Get',
   path: '/recipes/{id}',
@@ -77,7 +77,7 @@ server.route({
     }
   }
 });
-
+// get recipe image url by filename
 server.route({
   method: 'Get',
   path: '/recipe/image/{imageName}',
