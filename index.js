@@ -9,11 +9,10 @@ require('./db');
 const { RecipeModel } = require('./model/recipe');
 
 function savePublicImageFromBuffer(imageName, file) {
-  const ext = path.extname(file.hapi.filename);
   //TODO: return error msg with image limit
   //TODO: check if dir exists
   console.log('check instance:', file instanceof fs.ReadStream);
-  const imgPath = './image/recipes/' + imageName + ext;
+  const imgPath = './image/recipes/' + imageName;
   const fileStream = fs.createWriteStream(imgPath);
   return new Promise((resolve, reject) => {
     file.on('error', function(err) {
@@ -25,7 +24,7 @@ function savePublicImageFromBuffer(imageName, file) {
     file.on('end', function(err) {
       const fileDetails = {
         originalname: file.hapi.filename,
-        filename: imageName + ext,
+        filename: imageName,
         mimetype: file.hapi.headers['content-type'],
         destination: 'image/recipes',
         size: fs.statSync(imgPath).size
@@ -121,7 +120,9 @@ server.route({
     }
 
     // save image to disk
-    const imageName = new ObjectId();
+    const file = request.payload.image;
+    const ext = path.extname(file.hapi.filename);
+    const imageName = new ObjectId() + ext;
     const fileDetails = await savePublicImageFromBuffer(
       imageName,
       request.payload.image
