@@ -3,13 +3,17 @@ const Hapi = require('hapi');
 const fp = require('lodash/fp');
 const { Types } = require('mongoose');
 const { ObjectId } = require('mongodb');
+const path = require('path');
 
 require('./db');
 const { RecipeModel } = require('./model/recipe');
+
 function savePublicImageFromBuffer(imageName, file) {
-  console.log(file.hapi);
+  const ext = path.extname(file.hapi.filename);
+  //TODO: return error msg with image limit
+  //TODO: check if dir exists
   console.log('check instance:', file instanceof fs.ReadStream);
-  const imgPath = './image/recipes/' + imageName;
+  const imgPath = './image/recipes/' + imageName + ext;
   const fileStream = fs.createWriteStream(imgPath);
   return new Promise((resolve, reject) => {
     file.on('error', function(err) {
@@ -20,9 +24,8 @@ function savePublicImageFromBuffer(imageName, file) {
 
     file.on('end', function(err) {
       const fileDetails = {
-        fieldname: file.hapi.headers.name,
         originalname: file.hapi.filename,
-        filename: imageName,
+        filename: imageName + ext,
         mimetype: file.hapi.headers['content-type'],
         destination: 'image/recipes',
         size: fs.statSync(imgPath).size
@@ -104,7 +107,8 @@ server.route({
   path: '/recipes/{id}/image',
   config: {
     payload: {
-      output: 'stream'
+      output: 'stream',
+      maxBytes: 4194304
     }
   },
   handler: async (request, h) => {
