@@ -59,6 +59,7 @@ server.route({
   method: 'Get',
   path: '/recipes',
   handler: request => {
+    // TODO: combine filename and image directory image/recipes
     return RecipeModel.find();
   }
 });
@@ -85,7 +86,7 @@ server.route({
     return h.file('./image/recipes/' + request.params.imageName);
   }
 });
-
+// post a recipe
 server.route({
   method: 'Post',
   path: '/recipes',
@@ -100,7 +101,7 @@ server.route({
     }
   }
 });
-
+// post a recipe image, recipeid required
 server.route({
   method: 'Post',
   path: '/recipes/{id}/image',
@@ -137,6 +138,9 @@ server.route({
     };
   }
 });
+// TODO: delete a recipe by id
+// TODO: update a recipe online field
+// TODO: update a recipe description...
 
 async function init() {
   await server.register({
