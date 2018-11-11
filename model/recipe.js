@@ -44,7 +44,7 @@ const Recipe = {
       {
         _id: false,
         name: String,
-        amount: Number,
+        amount: String,
         unit: String
       }
     ],
