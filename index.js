@@ -1,4 +1,5 @@
 require('dotenv').config();
+const url = require('url');
 const fs = require('fs');
 const Hapi = require('hapi');
 const fp = require('lodash/fp');
@@ -56,11 +57,10 @@ server.route({
   }
 });
 function patchRecipeImagePath(r) {
-  r.image = path.join(
-    `${process.env.FRONT_URL}:${process.env.PORT}`,
-    process.env.RECIPE_IMAGE_PUBLIC_PATH,
-    r.image
-  );
+  r.image = new url.URL(
+    path.join(process.env.RECIPE_IMAGE_PUBLIC_PATH, r.image),
+    `${process.env.FRONT_URL}:${process.env.PORT}`
+  ).href;
   return r;
 }
 //get all reipes
