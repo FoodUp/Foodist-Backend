@@ -1,7 +1,8 @@
 var mongoose = require('mongoose');
 
+console.log(process.env.DB);
 mongoose.connect(
-  'mongodb://localhost:27017/foodist',
+  process.env.DB,
   { useNewUrlParser: true },
   err => {
     if (err) {

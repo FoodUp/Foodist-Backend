@@ -1,3 +1,4 @@
+require('dotenv').config();
 const fs = require('fs');
 const Hapi = require('hapi');
 const fp = require('lodash/fp');
@@ -36,7 +37,7 @@ function savePublicImageFromBuffer(imageName, file) {
   return;
 }
 
-const Port = 3001;
+const Port = process.env.PORT;
 const Host = 'localhost';
 const server = Hapi.server({
   port: Port,
@@ -54,13 +55,22 @@ server.route({
     return 'hello hello';
   }
 });
+function patchRecipeImagePath(r) {
+  r.image = path.join(
+    `${process.env.FRONT_URL}:${process.env.PORT}`,
+    process.env.RECIPE_IMAGE_PUBLIC_PATH,
+    r.image
+  );
+  return r;
+}
 //get all reipes
 server.route({
   method: 'Get',
   path: '/recipes',
   handler: request => {
-    // TODO: combine filename and image directory image/recipes
-    return RecipeModel.find();
+    return RecipeModel.find().then(rcps =>
+      rcps.map(r => patchRecipeImagePath(r))
+    );
   }
 });
 // get recipe by id
@@ -71,7 +81,11 @@ server.route({
     try {
       request.logger.info('In handler %s', request.path);
       const rslt = await RecipeModel.findOne({ _id: request.params.id });
-      return rslt || h.response('recipe not found').code(404);
+      if (!rslt) {
+        return h.response('recipe not found').code(404);
+      } else {
+        return patchRecipeImagePath(rslt);
+      }
     } catch (err) {
       console.log(err);
       return h.response(err.message).code(404);
@@ -81,9 +95,11 @@ server.route({
 // get recipe image url by filename
 server.route({
   method: 'Get',
-  path: '/recipe/image/{imageName}',
+  path: path.join(process.env.RECIPE_IMAGE_PUBLIC_PATH, '/{imageName}'),
   handler: (request, h) => {
-    return h.file('./image/recipes/' + request.params.imageName);
+    return h.file(
+      path.join(process.env.RECIPE_IMAGE_LOCAL_PATH, request.params.imageName)
+    );
   }
 });
 // post a recipe
@@ -91,7 +107,6 @@ server.route({
   method: 'Post',
   path: '/recipes',
   handler: async (request, h) => {
-    console.log(request.payload);
     try {
       const recipe = await RecipeModel.create(request.payload);
       return recipe;
@@ -113,7 +128,6 @@ server.route({
   },
   handler: async (request, h) => {
     // check if id exists in db
-    console.log('request recipe id: ', request.params.id);
     const recipeId = request.params.id;
     const recipe = await RecipeModel.findOne({ _id: recipeId });
     if (!recipe) {
@@ -128,7 +142,6 @@ server.route({
       imageName,
       request.payload.image
     );
-    console.log('saved file:', fileDetails);
     // update recipe with image path
     recipe.image = imageName;
     await recipe.save();
