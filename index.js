@@ -39,10 +39,8 @@ function savePublicImageFromBuffer(imageName, file) {
 }
 
 const Port = process.env.PORT;
-const Host = 'localhost';
 const server = Hapi.server({
   port: Port,
-  host: Host,
   routes: {
     cors: true
   }
@@ -165,7 +163,7 @@ async function init() {
   });
   await server.register(require('inert'));
   await server.start();
-  console.log(`server has started at: ${Host}:${Port}`);
+  console.log(`server has started at: ${Port}`);
 }
 
 process.on('unhandledRejection', err => {
