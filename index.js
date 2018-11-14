@@ -90,6 +90,24 @@ server.route({
     }
   }
 });
+// search recipe by term
+server.route({
+  method: 'Get',
+  path: '/recipes/search',
+  handler: async (request, h) => {
+    try {
+      const { term } = request.query;
+      if (term) {
+      } else {
+        return h.response([]);
+      }
+      request.logger.info('seerch handler', request.path);
+      return RecipeModel.find({ $text: { $search: term } });
+    } catch (err) {
+      return h.response(err.message).code(500);
+    }
+  }
+});
 // get recipe image url by filename
 server.route({
   method: 'Get',
@@ -149,6 +167,7 @@ server.route({
     };
   }
 });
+
 // TODO: delete a recipe by id
 // TODO: update a recipe online field
 // TODO: update a recipe description...
