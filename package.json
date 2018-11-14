@@ -8,8 +8,7 @@
     "start:dev": "nodemon index.js",
     "start": "node index.js",
     "deploy": "./update-server.sh",
-    "build:docker": "docker build -t ofoodisto/api:latest .",
-    "build:deploy": "docker build -t ofoodisto/api:latest . && docker push ofoodisto/api:latest && ./update-server.sh"
+    "build:docker": "docker build -t ofoodisto/api:latest ."
   },
   "keywords": [],
   "author": "",
