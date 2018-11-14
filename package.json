@@ -7,7 +7,9 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start:dev": "nodemon index.js",
     "start": "node index.js",
-    "build:docker": "docker build -t ofoodisto/api:latest ."
+    "deploy": "./update-server.sh",
+    "build:docker": "docker build -t ofoodisto/api:latest .",
+    "build:deploy": "docker build -t ofoodisto/api:latest . && docker push ofoodisto/api:latest && ./update-server.sh"
   },
   "keywords": [],
   "author": "",
