@@ -55,10 +55,12 @@ server.route({
   }
 });
 function patchRecipeImagePath(r) {
-  r.image = new url.URL(
-    path.join(process.env.RECIPE_IMAGE_PUBLIC_PATH, r.image),
-    `${process.env.FRONT_URL}:${process.env.PORT}`
-  ).href;
+  if (typeof r.image !== 'undefined') {
+    r.image = new url.URL(
+      path.join(process.env.RECIPE_IMAGE_PUBLIC_PATH, r.image),
+      `${process.env.FRONT_URL}:${process.env.PORT}`
+    ).href;
+  }
   return r;
 }
 //get all reipes
@@ -102,7 +104,9 @@ server.route({
         return h.response([]);
       }
       request.logger.info('seerch handler', request.path);
-      return RecipeModel.find({ $text: { $search: term } });
+      return RecipeModel.find({ $text: { $search: term } }).then(rcps =>
+        rcps.map(r => patchRecipeImagePath(r))
+      );
     } catch (err) {
       return h.response(err.message).code(500);
     }
