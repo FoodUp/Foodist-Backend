@@ -13,8 +13,7 @@ const { RecipeModel } = require('./model/recipe');
 function savePublicImageFromBuffer(imageName, file) {
   //TODO: return error msg with image limit
   //TODO: check if dir exists
-  console.log('check instance:', file instanceof fs.ReadStream);
-  const imgPath = './image/recipes/' + imageName;
+  const imgPath = path.join(process.env.RECIPE_IMAGE_LOCAL_PATH, imageName);
   const fileStream = fs.createWriteStream(imgPath);
   return new Promise((resolve, reject) => {
     file.on('error', function(err) {
@@ -173,6 +172,21 @@ server.route({
 });
 
 // TODO: delete a recipe by id
+server.route({
+  method: 'Delete',
+  path: '/recipes/{id}',
+  handler: async (request, h) => {
+    const recipeId = request.params.id;
+    const recipe = await RecipeModel.deleteOne({ _id: recipeId });
+    console.log('returning', recipe);
+    if (!recipe) {
+      return h.response('recipe not found').code(404);
+    }
+    return {
+      status: 'success'
+    };
+  }
+});
 // TODO: update a recipe online field
 // TODO: update a recipe description...
 
